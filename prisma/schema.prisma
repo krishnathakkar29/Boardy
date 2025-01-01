@@ -20,6 +20,51 @@ model User {
   clerkUserId String  @unique
   imageUrl    String?
 
+  boards                  Board[]
+  organisationMemberships OrganisationMembership[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Organisation {
+  id         String  @id @default(cuid())
+  name       String  @unique
+  clerkOrgId String  @unique
+  imageUrl   String?
+
+  boards                  Board[]
+  organisationMemberships OrganisationMembership[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrganisationMembership {
+  id             String @id @default(cuid())
+  userId         String
+  organisationId String
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organisation Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, organisationId])
+}
+
+model Board {
+  id        String  @id @default(cuid())
+  title     String
+  orgId     String
+  userId    String
+  imageUrl  String?
+  favourite Boolean @default(false)
+
+  organisation Organisation @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
