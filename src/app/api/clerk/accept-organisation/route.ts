@@ -30,6 +30,7 @@ export async function POST(req: Request) {
       data: {
         organisationId: organisation.id,
         userId: user.id,
+        role: data.role,
       },
     });
 

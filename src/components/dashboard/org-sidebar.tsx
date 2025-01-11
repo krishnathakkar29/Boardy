@@ -47,9 +47,7 @@ const OrgSidebar = (props: Props) => {
         }}
       />
 
-      <div className="space-y-1 w-full">
-        
-      </div>
+      <div className="space-y-1 w-full"></div>
     </div>
   );
 };
