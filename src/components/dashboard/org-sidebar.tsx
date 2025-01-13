@@ -5,6 +5,9 @@ import { Poppins } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { Button } from "../ui/button";
+import { LayoutDashboard, Star } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 const font = Poppins({
   subsets: ["latin"],
@@ -14,8 +17,10 @@ const font = Poppins({
 type Props = {};
 
 const OrgSidebar = (props: Props) => {
+  const searchParams = useSearchParams();
+  const favorite = searchParams.get("favorites");
   return (
-    <div className="hidden lg:flex flex-col space-y-6 w-[190px] px-6 pt-5">
+    <div className="hidden lg:flex flex-col space-y-6 w-[200px] pl-5 pt-5 mr-5">
       <Link href="/">
         <div className="flex items-center gap-x-2">
           <Image src="/logo.svg" alt="Logo" height={60} width={60} />
@@ -47,7 +52,38 @@ const OrgSidebar = (props: Props) => {
         }}
       />
 
-      <div className="space-y-1 w-full"></div>
+      <div className="space-y-1 w-full">
+        <Button
+          variant={favorite ? "ghost" : "secondary"}
+          asChild
+          size="lg"
+          className="font-normal justify-start px-2 w-full"
+        >
+          <Link href="/dashboard">
+            <LayoutDashboard className="h-4 w-4 mr-2" />
+            Team Boards
+          </Link>
+        </Button>
+
+        <Button
+          variant={!favorite ? "ghost" : "secondary"}
+          asChild
+          size="lg"
+          className="font-normal justify-start px-2 w-full"
+        >
+          <Link
+            href={{
+              pathname: "/dashboard",
+              query: {
+                favorites: "true",
+              },
+            }}
+          >
+            <Star className="h-4 w-4 mr-2" />
+            Favorite Boards
+          </Link>
+        </Button>
+      </div>
     </div>
   );
 };

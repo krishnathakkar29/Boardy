@@ -15,7 +15,7 @@ const DashBoardLayout = ({ children }: DashBoardLayoutProps) => {
         <div className="flex h-full">
           <OrgSidebar />
           <div className="border-l border-gray-300 h-full" />
-          <div className="h-full flex-1">
+          <div className="h-full flex-1 flex flex-col">
             <Navbar />
             {children}
           </div>
