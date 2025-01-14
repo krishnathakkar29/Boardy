@@ -4,7 +4,7 @@ import { OrganizationSwitcher } from "@clerk/nextjs";
 import { Poppins } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { Suspense } from "react";
 import { Button } from "../ui/button";
 import { LayoutDashboard, Star } from "lucide-react";
 import { useSearchParams } from "next/navigation";
@@ -16,7 +16,7 @@ const font = Poppins({
 
 type Props = {};
 
-const OrgSidebar = (props: Props) => {
+const OrgSidebarClient = (props: Props) => {
   const searchParams = useSearchParams();
   const favorite = searchParams.get("favorites");
   return (
@@ -85,6 +85,15 @@ const OrgSidebar = (props: Props) => {
         </Button>
       </div>
     </div>
+  );
+};
+
+const OrgSidebar = () => {
+  //TODO: improve the fallback
+  return (
+    <Suspense fallback={<div>Search Params Loading...</div>}>
+      <OrgSidebarClient />
+    </Suspense>
   );
 };
 
