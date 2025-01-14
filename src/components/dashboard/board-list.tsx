@@ -16,7 +16,6 @@ type Props = {
 
 const BoardList = async ({ orgId, query }: Props) => {
   const { userId } = await auth();
-  //TODO: call the boards data
   const data = await prisma.board.findMany({
     where: {
       clerkOrgId: orgId,
@@ -25,11 +24,7 @@ const BoardList = async ({ orgId, query }: Props) => {
       createdAt: "desc",
     },
     include: {
-      Favorite: {
-        select: {
-          userId: true,
-        },
-      },
+      Favorite: true,
       user: {
         select: {
           name: true,
@@ -40,10 +35,12 @@ const BoardList = async ({ orgId, query }: Props) => {
 
   console.log(data);
 
-  const boardsWithFavorites = data.map((item) => ({
-    ...item,
-    isFavorite: item.Favorite.some((fav) => fav.userId == userId),
-    authorName: item.user?.name || "Unknown",
+  const boardsWithFavorites = data.map((board) => ({
+    ...board,
+    isFavorite: board.Favorite.some(
+      (fav) => fav.clerkUserId == userId && fav.boardId == board.id
+    ),
+    authorName: board.user?.name || "Unknown",
   }));
 
   if (!data.length && query.search) {
@@ -75,7 +72,7 @@ const BoardList = async ({ orgId, query }: Props) => {
             authorName={board.authorName}
           />
         ))}
-        <NewBoardButton orgId={orgId}/>
+        <NewBoardButton orgId={orgId} />
       </div>
     </div>
   );

@@ -129,3 +129,107 @@ export async function updateBoard({
     throw new Error("Failed to update board", error.message);
   }
 }
+
+export async function addToFavorite({
+  boardId,
+  orgId,
+}: {
+  boardId: string;
+  orgId: string;
+}) {
+  try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        clerkUserId: userId,
+      },
+    });
+
+    const existingFav = await prisma.favorite.findMany({
+      where: {
+        boardId: boardId,
+        clerkOrgId: orgId,
+        clerkUserId: userId,
+      },
+    });
+
+    const uniqueBoard = existingFav[0];
+
+    if (uniqueBoard) {
+      throw new Error("Board already is in the favorites");
+    }
+
+    const createdFav = await prisma.favorite.create({
+      data: {
+        clerkUserId: userId,
+        boardId: boardId,
+        clerkOrgId: orgId,
+        userId: user?.id!,
+      },
+    });
+
+    return {
+      success: true,
+      board: createdFav,
+    };
+  } catch (error: any) {
+    console.log("Error adding to favorite ", error);
+    throw new Error("Failed to add to favorite", error.message);
+  }
+}
+
+export async function removeFromFavorite({
+  boardId,
+  orgId,
+}: {
+  boardId: string;
+  orgId: string;
+}) {
+  try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        clerkUserId: userId,
+      },
+    });
+
+    //TODO: check if any of the constraint can be removed
+    const existingFav = await prisma.favorite.findMany({
+      where: {
+        boardId: boardId,
+        clerkOrgId: orgId,
+        clerkUserId: userId,
+      },
+    });
+
+    const uniqueBoard = existingFav[0];
+
+    if (!uniqueBoard) {
+      throw new Error("Favorited Board not found");
+    }
+
+    const createdFav = await prisma.favorite.delete({
+      where: {
+        id: uniqueBoard.id,
+      },
+    });
+
+    return {
+      success: true,
+      board: createdFav,
+    };
+  } catch (error: any) {
+    console.log("Error updating board", error);
+    throw new Error("Failed to update board", error.message);
+  }
+}

@@ -8,7 +8,7 @@ type Props = {
   authorLabel: string;
   createdAtLabel: string;
   isFavorite: boolean;
-  onClick?: () => void;
+  onClick: () => void;
   disabled: boolean;
 };
 
@@ -20,7 +20,11 @@ const Footer = ({
   onClick,
   disabled,
 }: Props) => {
-  const handleClick = () => {};
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    onClick();
+  };
   return (
     <div className="relative p-3 bg-white">
       <p className="text-[13px] truncate max-w-[calc(100%-20px)]">{title}</p>

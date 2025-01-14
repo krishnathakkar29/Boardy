@@ -1,13 +1,18 @@
 "use client";
+import Actions from "@/components/actions";
 import { useAuth } from "@clerk/nextjs";
 import { formatDistanceToNow } from "date-fns";
+import { MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import Overlay from "./overlay";
 import Footer from "./footer";
-import { Skeleton } from "@/components/ui/skeleton";
-import Actions from "@/components/actions";
-import { MoreHorizontal } from "lucide-react";
+import Overlay from "./overlay";
+import useFetch from "@/hooks/use-fetch";
+import {
+  addToFavorite,
+  removeFromFavorite,
+} from "../../../../actions/boardActions";
+import { useRouter } from "next/navigation";
 
 type Props = {
   id: string;
@@ -39,7 +44,31 @@ const BoardCard = ({
     addSuffix: true,
   });
 
-  const onClick = () => {};
+  const router = useRouter();
+
+  const {
+    data: addFavData,
+    loading: addFavLoading,
+    fn: fnAddToFavorite,
+    error: addFavError,
+  } = useFetch(addToFavorite);
+
+  const {
+    data: removeFavData,
+    loading: removeFavLoading,
+    fn: fnRemoveFromFavorite,
+    error: removeFavError,
+  } = useFetch(removeFromFavorite);
+
+  const toggleFavorite = async () => {
+    if (isFavorite) {
+      await fnRemoveFromFavorite({ boardId: id, orgId: clerkOrgId });
+    } else {
+      await fnAddToFavorite({ boardId: id, orgId: clerkOrgId });
+    }
+
+    router.refresh();
+  };
 
   return (
     <Link href={`/board/${id}`}>
@@ -67,8 +96,8 @@ const BoardCard = ({
           title={title}
           authorLabel={authorNameLabel}
           createdAtLabel={createdAtLabel}
-          onClick={onClick}
-          disabled={false}
+          onClick={toggleFavorite}
+          disabled={addFavLoading || removeFavLoading}
         />
       </div>
     </Link>
