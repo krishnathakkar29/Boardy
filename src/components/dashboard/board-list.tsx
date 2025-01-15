@@ -16,32 +16,71 @@ type Props = {
 
 const BoardList = async ({ orgId, query }: Props) => {
   const { userId } = await auth();
-  const data = await prisma.board.findMany({
-    where: {
-      clerkOrgId: orgId,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    include: {
-      Favorite: true,
-      user: {
-        select: {
-          name: true,
+  let data = [];
+  let boardsWithFavorites = [];
+
+  if (query.favorites) {
+    data = await prisma.favorite.findMany({
+      where: {
+        clerkOrgId: orgId,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+          },
+        },
+        board: true,
+      },
+    });
+
+    boardsWithFavorites = data.map((board) => ({
+      id: board.id,
+      title: board.board.title,
+      orgId: board.board.orgId,
+      userId: board.userId,
+      imageUrl: board.board.imageUrl,
+      clerkOrgId: board.clerkOrgId,
+      clerkUserId: board.clerkUserId,
+      createdAt: board.board.createdAt,
+      updatedAt: board.board.updatedAt,
+      isFavorite: true,
+      authorName: board.user.name || "Unknown",
+      user: board.user,
+    }));
+  } else {
+    data = await prisma.board.findMany({
+      where: {
+        clerkOrgId: orgId,
+        title: {
+          contains: query.search || "",
+          mode: "insensitive",
         },
       },
-    },
-  });
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        Favorite: true,
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
 
-  console.log(data);
-
-  const boardsWithFavorites = data.map((board) => ({
-    ...board,
-    isFavorite: board.Favorite.some(
-      (fav) => fav.clerkUserId == userId && fav.boardId == board.id
-    ),
-    authorName: board.user?.name || "Unknown",
-  }));
+    boardsWithFavorites = data.map((board) => ({
+      ...board,
+      isFavorite: board.Favorite.some(
+        (fav) => fav.clerkUserId == userId && fav.boardId == board.id
+      ),
+      authorName: board.user?.name || "Unknown",
+    }));
+  }
 
   if (!data.length && query.search) {
     return <EmptySearch />;

@@ -17,10 +17,11 @@ const NewBoardButton = ({ orgId, disabled }: Props) => {
   const router = useRouter();
 
   const onClick = async () => {
-    await fnCreateBoard("Untitled", orgId);
+    const result = await fnCreateBoard("Untitled", orgId);
 
-    if (data?.success) {
+    if (!error) {
       toast.success("Board created successssfully!");
+      //TODO: push
     }
 
     router.refresh();

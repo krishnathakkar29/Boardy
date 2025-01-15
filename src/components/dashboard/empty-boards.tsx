@@ -22,6 +22,7 @@ const EmptyBoards = (props: Props) => {
 
     if (data?.success) {
       toast.success("Board created successssfully!");
+      //TODO: push
     }
 
     router.refresh();
