@@ -15,8 +15,8 @@ type Props = {
 
 const Room = ({ children, roomId, fallback }: Props) => {
   return (
-    <LiveblocksProvider authEndpoint={"/api/liveblocks-auth"}>
-      <RoomProvider id={roomId} initialPresence={{}}>
+    <LiveblocksProvider throttle={16} authEndpoint={"/api/liveblocks-auth"}>
+      <RoomProvider id={roomId} initialPresence={{ cursor: null }}>
         <ClientSideSuspense fallback={fallback}>{children}</ClientSideSuspense>
       </RoomProvider>
     </LiveblocksProvider>

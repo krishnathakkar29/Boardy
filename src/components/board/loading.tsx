@@ -1,7 +1,7 @@
 import { Loader } from "lucide-react";
 import React from "react";
 import { ParticipantsSkeleton } from "./participants";
-import { ToolbarSkeleton } from "./toolbar";
+import { ToolbarSkeleton } from "./toolbar/toolbar";
 import { InfoSkeleton } from "./info/info";
 
 type Props = {};
